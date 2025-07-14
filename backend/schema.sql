@@ -58,6 +58,15 @@ CREATE TABLE IF NOT EXISTS solution(
   parameters_solution JSONB
 );
 
+CREATE TABLE usuario (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  username TEXT UNIQUE NOT NULL,
+  hash_password TEXT NOT NULL,
+  active BOOLEAN DEFAULT TRUE,
+);
+
+
 CREATE TRIGGER trigger_update_updated_at_solution
 BEFORE UPDATE ON solution
 FOR EACH ROW
