@@ -6,13 +6,13 @@ class Scenario(Base):
     __tablename__ = "scenario"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
+    user_id = Column(Integer, ForeignKey("solver_user.id", ondelete="CASCADE"), nullable=False)
     name = Column(Text, nullable=False)
     description = Column(Text)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now())
 
-    user = relationship("SolverUser", back_populates="scenarios")
+    solver_user = relationship("SolverUser", back_populates="scenarios")
     routes = relationship("Route", back_populates="scenario", cascade="all, delete-orphan")
     solution = relationship("Solution", back_populates="scenario", cascade="all, delete-orphan")
     bus_types = relationship("BusType", back_populates="scenario", cascade="all, delete-orphan")

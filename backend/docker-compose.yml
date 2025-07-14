@@ -1,0 +1,35 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    env_file:
+      - .env
+    networks:
+      - bus-allocation-network
+
+  db:
+    image: postgres:17
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=trabalho_final
+      - POSTGRES_DB=database-1
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - bus-allocation-network
+
+volumes:
+  postgres_data:
+
+networks:
+  bus-allocation-network:
+    driver: bridge

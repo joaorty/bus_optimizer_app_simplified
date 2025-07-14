@@ -5,8 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 class UserService:
     def __init__(self):
         self.user_repository = RepositoryManager.get_user_repository()
-        self.simulation_repository = RepositoryManager.get_simulation_repository()
-        self.parameter_repository = RepositoryManager.get_parameter_repository()
+        self.scenario_repository = RepositoryManager.get_scenario_repository()
 
     # === CRUD ===
     def create_user(self, name: str, username: str, password: str):
@@ -95,15 +94,15 @@ class UserService:
         return [self._clean_user_dict(user) for user in users]
 
     # === Recursos Relacionados ===
-    def get_user_simulations(self, user_id: int):
+    def get_user_scenarios(self, user_id: int):
         if not self.verify_id(user_id):
             raise ValueError("SolverUser not found.")
 
-        simulations = self.simulation_repository.find_by(user_id=user_id)
-        if not simulations:
-            raise ValueError("No simulations found for the given user.")
+        scenarios = self.scenario_repository.find_by(user_id=user_id)
+        if not scenarios:
+            raise ValueError("No scenarios found for the given user.")
 
-        return [sim.to_dict() for sim in simulations]
+        return [sim.to_dict() for sim in scenarios]
 
     def get_user_parameters(self, user_id: int):
         if not self.verify_id(user_id):

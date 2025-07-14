@@ -1,4 +1,4 @@
-from app.config import DatabaseSQLAlchemy
+from app.utils import DatabaseSQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import select, text
 
