@@ -16,7 +16,10 @@ def main():
   ---
   """)
 
-  st.info("Navegue pelo menu lateral para acessar as funcionalidades do sistema.")
+  st.info("Antes, é necessário realizar login para acessar todas as funcionalidades do sistema.")
+
+  if st.button("Ir para Login"):
+    st.switch_page("pages/0_Login.py")
 
   st.markdown("### 📘 Sobre o Projeto")
   st.markdown("""
