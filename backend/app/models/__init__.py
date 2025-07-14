@@ -3,3 +3,4 @@ from .parameters_model import Parameters
 from .route_model import Route
 from .scenario_model import Scenario
 from .solution_model import Solution
+from .user_model import SolverUser

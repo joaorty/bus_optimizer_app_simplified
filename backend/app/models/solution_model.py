@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, ForeignKey, TIMESTAMP, func, Enum, Numeric, JSON
 from sqlalchemy.orm import relationship
 import enum
-from .base import Base
+from app.utils import Base
 
 class SolutionStatus(str, enum.Enum):
     pending = "Pending"

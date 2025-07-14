@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, ForeignKey, Numeric
 from sqlalchemy.orm import relationship
-from .base import Base
+from app.utils import Base
 
 class BusType(Base):
     __tablename__ = "bus_type"

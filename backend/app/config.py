@@ -18,17 +18,13 @@ DB_NAME = os.getenv("DB_NAME")
 # Monta a URL do banco
 DB_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
-# Cria o engine e a session factory
-engine = create_engine(DB_URL)
-SessionFactory = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-ScopedSession = scoped_session(SessionFactory)
+class Config:
+    TEMPLATES_AUTO_RELOAD = True
+    SECRET_KEY = 'dev'
+    
+    # Configurações do SQLAlchemy
+    SQLALCHEMY_DATABASE_URI = DB_URL
 
-class DatabaseSQLAlchemy:
-    @staticmethod
-    @contextmanager
-    def get_db():
-        db = ScopedSession()
-        try:
-            yield db
-        finally:
-            db.close()
+    DEVELOPMENT = True
+    DEBUG = True
+    CSRF_ENABLED = True

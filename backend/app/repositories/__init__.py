@@ -3,6 +3,7 @@ from app.repositories.route_repository import RouteRepository
 from app.repositories.solution_repository import SolutionRepository
 from app.repositories.bus_type_repository import BusTypeRepository
 from app.repositories.parameters_repository import ParametersRepository
+from app.repositories.user_repository import SolverUserRepository
 
 class RepositoryManager:
     """
@@ -14,6 +15,7 @@ class RepositoryManager:
     - Facilita os imports e promove desacoplamento.
     """
 
+    _user_repository: SolverUserRepository = None
     _scenario_repository: ScenarioRepository = None
     _route_repository: RouteRepository = None
     _solution_repository: SolutionRepository = None
@@ -21,6 +23,13 @@ class RepositoryManager:
     _parameters_repository: ParametersRepository = None
 
     _repositories = {}
+
+    @staticmethod
+    def get_user_repository() -> SolverUserRepository:
+        if RepositoryManager._user_repository is None:
+            RepositoryManager._user_repository = SolverUserRepository()
+            RepositoryManager._repositories["SolverUserRepository"] = RepositoryManager._user_repository
+        return RepositoryManager._user_repository
 
     @staticmethod
     def get_scenario_repository() -> ScenarioRepository:
@@ -59,9 +68,6 @@ class RepositoryManager:
 
     @staticmethod
     def get_repository_by_name(name: str):
-        """
-        Retorna um repositório pelo nome da classe.
-        """
         if name not in RepositoryManager._repositories:
             RepositoryManager._repositories[name] = globals()[name]()
         return RepositoryManager._repositories[name]
