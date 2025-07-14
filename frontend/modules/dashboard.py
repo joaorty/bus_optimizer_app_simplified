@@ -1,43 +1,82 @@
-from plotly.subplots import make_subplots
+import plotly.express as px
+import plotly.graph_objects as go
+import pandas as pd
+import streamlit as st
 
-import plotly.graph_objs as go
+def gerar_dashboard(cenario: dict):
+  figs = []
 
-class Dashboard:
-  def __init__(self, scenario, solution):
-    self.scenario = scenario
-    self.solution = solution
+  # --- 1. Rotas: demanda por rota ---
+  rotas = cenario.get("routes", [])
+  if rotas:
+    df_rotas = pd.DataFrame(rotas)
+    fig1 = px.bar(
+      df_rotas,
+      x="id",
+      y="passengers",
+      title="Demanda de Passageiros por Rota",
+      labels={"id": "Rota", "passengers": "Passageiros"}
+    )
+    figs.append(fig1)
 
-  def plot_route_distribution(self):
-    # Exemplo: Distribuição de passageiros por rota
-    routes = [route.name for route in self.scenario.routes]
-    passengers = [self.solution.route_passengers[route.name] for route in self.scenario.routes]
+  # --- 2. Tipos de ônibus: custo e capacidade ---
+  bus_types = cenario.get("bus_types", [])
+  if bus_types:
+    df_buses = pd.DataFrame(bus_types)
+    fig2 = px.bar(
+      df_buses,
+      x="id",
+      y=["seat_capacity", "available_units"],
+      barmode="group",
+      title="Capacidade e Unidades Disponíveis por Tipo de Ônibus",
+      labels={"id": "Tipo de Ônibus"}
+    )
+    figs.append(fig2)
 
-    fig = go.Figure([go.Bar(x=routes, y=passengers)])
-    fig.update_layout(title="Passageiros por Rota", xaxis_title="Rota", yaxis_title="Passageiros")
-    return fig
+  # --- 3. Solução otimizada: uso de ônibus por tipo ---
+  solutions = cenario.get("solutions", [])
+  if solutions:
+    sol = solutions[0]  # usa a primeira solução
+    v_dict = sol["solution_data"]["variables"]["v"]  # Ex: {"1_3": 2, ...}
+    v_df = pd.DataFrame([
+      {"bus_id": int(k.split("_")[0]), "route_id": int(k.split("_")[1]), "value": v}
+      for k, v in v_dict.items()
+    ])
+    fig3 = px.bar(
+      v_df,
+      x="bus_id",
+      y="value",
+      color="route_id",
+      title="Uso dos Ônibus por Tipo e Rota",
+      labels={"bus_id": "Tipo de Ônibus", "value": "Unidades Usadas"}
+    )
+    figs.append(fig3)
 
-  def plot_vehicle_utilization(self):
-    # Exemplo: Utilização dos veículos
-    vehicles = [v.id for v in self.scenario.vehicles]
-    utilization = [self.solution.vehicle_utilization[v.id] for v in self.scenario.vehicles]
+    # --- 4. Headway por rota ---
+    h_dict = sol["solution_data"]["variables"]["H"]
+    h_df = pd.DataFrame([
+      {"route_id": int(r), "headway": h}
+      for r, h in h_dict.items()
+    ])
+    fig4 = px.bar(
+      h_df,
+      x="route_id",
+      y="headway",
+      title="Headway por Rota",
+      labels={"route_id": "Rota", "headway": "Minutos"}
+    )
+    figs.append(fig4)
 
-    fig = go.Figure([go.Bar(x=vehicles, y=utilization)])
-    fig.update_layout(title="Utilização dos Veículos", xaxis_title="Veículo", yaxis_title="Utilização (%)")
-    return fig
+    # --- 5. Valor objetivo ---
+    st.metric(label="🎯 Valor Objetivo da Solução", value=round(sol["objective_value"], 2))
 
-  def plot_summary(self):
-    # Exemplo: Resumo em subplots
-    fig = make_subplots(rows=1, cols=2, subplot_titles=("Passageiros por Rota", "Utilização dos Veículos"))
+    # --- 6. Parâmetros utilizados ---
+    parametros = cenario.get("parameters", [])
+    if parametros:
+      st.subheader("⚙️ Parâmetros do Modelo")
+      st.json(parametros[0])  # mostra primeiro conjunto
 
-    # Passageiros por rota
-    routes = [route.name for route in self.scenario.routes]
-    passengers = [self.solution.route_passengers[route.name] for route in self.scenario.routes]
-    fig.add_trace(go.Bar(x=routes, y=passengers), row=1, col=1)
+  else:
+    st.warning("⚠️ Nenhuma solução otimizada encontrada para este cenário.")
 
-    # Utilização dos veículos
-    vehicles = [v.id for v in self.scenario.vehicles]
-    utilization = [self.solution.vehicle_utilization[v.id] for v in self.scenario.vehicles]
-    fig.add_trace(go.Bar(x=vehicles, y=utilization), row=1, col=2)
-
-    fig.update_layout(title_text="Resumo do Cenário e Solução")
-    return fig
+  return figs
