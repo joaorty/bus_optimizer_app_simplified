@@ -1,26 +1,55 @@
 import streamlit as st
 import streamlit_authenticator as stauth
+import requests
+from config import API_URL
 
+@st.cache_data(ttl=300)
+def carregar_usuarios_da_api():
+  """Consulta a API Flask e monta as credenciais para o streamlit-authenticator"""
+  try:
+    response = requests.get(API_URL)
+    data = response.json()
 
-names, users, hashed_passwords = LoginController.get_users()
+    if not data["success"]:
+      raise Exception("Erro na API: 'success' é False.")
+
+    usuarios = data["users"]
+    credentials = {
+      "usernames": {}
+    }
+
+    for u in usuarios:
+      credentials["usernames"][u["email"]] = {
+        "name": u["name"],
+        "password": u["password"]  # Já é hash bcrypt
+      }
+
+    return credentials
+
+  except Exception as e:
+    st.error(f"⚠️ Erro ao carregar usuários da API Flask: {e}")
+    st.stop()
+
+credentials = carregar_usuarios_da_api()
 
 authenticator = stauth.Authenticate(
-  names,
-  users,
-  hashed_passwords,
-  'bus_optimizer_app',
-  'abcdef',
+  credentials,
+  cookie_name="auth_cookie",
+  key="signature_key",
   cookie_expiry_days=1
 )
 
-name, authentication_status, username = authenticator.login('Login', 'main')
+nome, auth_status, email = authenticator.login("Login", "main")
 
-if authentication_status is False:
-  st.error('Usuário ou senha incorretos')
-elif authentication_status is None:
-  st.warning('Por favor, insira seu usuário e senha')
-elif authentication_status:
-  st.success(f'Bem-vindo, {name}!')
-  st.write('Você está logado.')
-  if st.button('Logout'):
-    authenticator.logout('Logout', 'main')
+if auth_status is None:
+  st.info("Digite seu e-mail e senha para acessar o sistema.")
+  st.stop()
+elif auth_status is False:
+  st.error("E-mail ou senha incorretos.")
+  st.stop()
+elif auth_status is True:
+  st.sidebar.success(f"✅ Bem-vindo, {nome}")
+  authenticator.logout("Sair", "sidebar")
+
+  # Aqui começa a área protegida
+  st.success(f"Você está logado como **{email}**.")

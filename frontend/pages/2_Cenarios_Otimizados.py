@@ -1,6 +1,8 @@
 import streamlit as st
 from modules.auth import require_login
 from modules.nav import Navbar
+import requests
+from config import API_URL
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
 import pandas as pd
 
@@ -8,6 +10,22 @@ Navbar()
 require_login()
 
 st.title("📁 Cenários Otimizados")
+
+def carregar_cenarios():
+    """Consulta a API Flask e retorna os cenários disponíveis."""
+    try:
+        response = requests.get(f"{API_URL}/cenarios")
+        data = response.json()
+
+        if not data["success"]:
+            raise Exception("Erro na API: 'success' é False.")
+
+        return data["cenarios"]
+
+    except Exception as e:
+        st.error(f"⚠️ Erro ao carregar cenários da API Flask: {e}")
+        st.stop()
+
 
 cenarios = carregar_cenarios()
 selected = st.selectbox("Escolha um cenário", list(cenarios.keys()))
