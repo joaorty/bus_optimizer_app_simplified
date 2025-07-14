@@ -23,11 +23,17 @@ class SolverUser(Base):
         return f"<SolverUser(id={self.id}, email={self.email})>"
 
     def to_dict(self):
+        try:
+            scenarios = [s.to_dict() for s in self.scenarios]
+        except:
+            scenarios = []  # sessão fechada, evita crash
+
         return {
             "id": self.id,
             "name": self.name,
             "email": self.email,
+            "password_hash": self.password_hash,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
-            "scenarios": [scenario.to_dict() for scenario in self.scenarios],
+            "scenarios": scenarios
         }

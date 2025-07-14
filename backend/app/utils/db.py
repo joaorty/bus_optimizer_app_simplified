@@ -2,15 +2,16 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import MetaData
 from sqlalchemy.inspection import inspect
+from contextlib import contextmanager
 
-metadata = MetaData(  )
+metadata = MetaData()
 
-class Base( DeclarativeBase ):
-    __abstract__ = True  # Ensures this base class is not mapped to a table
+class Base(DeclarativeBase):
+    __abstract__ = True
     metadata = metadata
 
-    def to_dict( self ):
-        mapper = inspect( self ).mapper
+    def to_dict(self):
+        mapper = inspect(self).mapper
         return {
             column.key: getattr(self, column.key, None)
             for column in self.__table__.columns
@@ -33,8 +34,8 @@ class DatabaseSQLAlchemy:
 
     @staticmethod
     def reset_db():
-        db = DatabaseSQLAlchemy.get_db()
-        with db.engine.connect() as conn:
+        sqlalchemy = DatabaseSQLAlchemy.get_db()
+        with sqlalchemy.engine.connect() as conn:
             conn.execute("DROP SCHEMA IF EXISTS public CASCADE;")
             conn.execute("CREATE SCHEMA public;")
-            db.session.commit()
+            sqlalchemy.session.commit()

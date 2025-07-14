@@ -21,7 +21,7 @@ class UserService:
         new_user = SolverUser(name=name, username=username, password=hashed_password)
         self.user_repository.save(new_user)
 
-        return self._clean_user_dict(new_user)
+        return new_user.to_dict()
 
     def delete_user_by_id(self, user_id: int):
         if not self.verify_id(user_id):
@@ -29,7 +29,7 @@ class UserService:
 
         user = self.user_repository.get_by_id(user_id)
         self.user_repository.delete(user)
-        return self._clean_user_dict(user)
+        return user.to_dict()
 
     def delete_user_by_username(self, username: str):
         if not self.verify_user(username):
@@ -37,7 +37,7 @@ class UserService:
 
         user = self.user_repository.find_by_username(username)
         self.user_repository.delete(user)
-        return self._clean_user_dict(user)
+        return user.to_dict()
 
     def update_user_by_id(self, user_id: int, new_username: str, new_password: str):
         user = self.user_repository.get_by_id(user_id)
@@ -50,7 +50,7 @@ class UserService:
         user.username = new_username
         user.password = generate_password_hash(new_password)
         updated_user = self.user_repository.update(user)
-        return self._clean_user_dict(updated_user)
+        return updated_user.to_dict()
 
     def update_user_by_username(self, old_username: str, new_username: str, new_password: str):
         if not self.verify_user(old_username):
@@ -62,7 +62,7 @@ class UserService:
         user.username = new_username
         user.password = generate_password_hash(new_password)
         updated_user = self.user_repository.update(user)
-        return self._clean_user_dict(updated_user)
+        return updated_user.to_dict()
 
     # === Acesso ===
     def login(self, username: str, password: str):
@@ -73,7 +73,7 @@ class UserService:
 
         user = self.user_repository.find_by_username(username)
         if user and check_password_hash(user.password, password):
-            return self._clean_user_dict(user)
+            return user.to_dict()
 
         raise ValueError("Invalid username or password.")
 
@@ -81,17 +81,17 @@ class UserService:
         user = self.user_repository.get_by_id(user_id)
         if not user:
             raise ValueError("SolverUser not found.")
-        return self._clean_user_dict(user)
+        return user.to_dict()
 
     def get_user_by_username(self, username: str):
         user = self.user_repository.find_by_username(username)
         if not user:
             raise ValueError("SolverUser not found.")
-        return self._clean_user_dict(user)
+        return user.to_dict()
 
     def get_all_users(self):
         users = self.user_repository.get_all()
-        return [self._clean_user_dict(user) for user in users]
+        return [user.to_dict() for user in users]
 
     # === Recursos Relacionados ===
     def get_user_scenarios(self, user_id: int):
