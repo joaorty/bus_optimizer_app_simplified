@@ -19,3 +19,7 @@ class SolutionRead(SolutionBase):
 
   class Config:
     orm_mode = True
+
+class OptimizationRequest(BaseModel):
+  scenario_id: int
+  M: Optional[float] = 1e4
