@@ -1,7 +1,5 @@
 import streamlit as st
-from modules.auth import require_login
-from modules.nav import Navbar
-from modules.carregar_cenarios import carregar_cenarios
+from utils import require_login, Navbar, carregar_cenarios
 import requests
 from config import API_URL
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode

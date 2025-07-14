@@ -1,8 +1,5 @@
 import streamlit as st
-from modules.auth import require_login
-from modules.carregar_cenarios import carregar_cenarios
-from modules.nav import Navbar
-from modules.dashboard import gerar_dashboard
+from utils import require_login, carregar_cenarios, Navbar, gerar_dashboard
 
 Navbar()
 require_login()
