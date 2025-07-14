@@ -40,6 +40,8 @@ for i in range(num_routes):
 parameters = dict()
 parameters["time_unit_of_periods"] = st.number_input("Tempo do período (minutos)", min_value=1, step=1)
 parameters["accetable_time_transfer"] = st.number_input("Tempo aceitável de transferência (minutos)", min_value=0, step=1)
+parameters["agglomeration_cost"] = st.number_input("Custo de aglomeração", min_value=1.0, step=0.5)
+parameters["accetable_time_transfer"] = st.number_input("Custo de tempo de espera", min_value=1.0, step=0.5)
 
 if st.button("Otimizar"):
   response = requests.post(
