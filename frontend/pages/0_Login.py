@@ -1,6 +1,7 @@
 import streamlit as st
 import streamlit_authenticator as stauth
 import requests
+from utils import Navbar
 from config import API_URL
 
 @st.cache_data(ttl=300)
@@ -40,6 +41,8 @@ authenticator = stauth.Authenticate(
 )
 
 nome, auth_status, email = authenticator.login("Login", "main")
+
+Navbar()
 
 if auth_status is None:
   st.info("Digite seu e-mail e senha para acessar o sistema.")
