@@ -1,1 +1,1 @@
-API_URL = "http://localhost:5000/optimization"
+API_URL = "http://localhost:5000/"
