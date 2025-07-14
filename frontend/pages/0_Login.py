@@ -7,7 +7,7 @@ from config import API_URL
 def carregar_usuarios_da_api():
   """Consulta a API Flask e monta as credenciais para o streamlit-authenticator"""
   try:
-    response = requests.get(API_URL)
+    response = requests.get(f"{API_URL}/users/")
     data = response.json()
 
     if not data["success"]:
