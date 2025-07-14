@@ -107,4 +107,4 @@ class UserService:
 
     def get_user_parameters(self, user_id: int):
         if not self.verify_id(user_id):
-            raise ValueError
+            raise ValueError("")

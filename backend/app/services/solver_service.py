@@ -11,6 +11,7 @@ class SolverService:
         self.route_repo = RepositoryManager.get_route_repository()
         self.bus_type_repo = RepositoryManager.get_bus_type_repository()
         self.solution_repo = RepositoryManager.get_solution_repository()
+        self.scenario_repo = RepositoryManager.get_scenario_repository()
 
     def extract_scenario_data(self, scenario_id):
         """Extrai dados do cenário usando repositórios"""
@@ -60,8 +61,22 @@ class SolverService:
         H = pulp.LpVariable.dicts("H", R, lowBound=0, cat='Continuous')
         return v, f, q, y, u, e, w, z, H
 
-    def run_model_linearized_static(self, scenario_id,  M=1e4):
+    def run_model_linearized_static(self, user_id: int, scenario_id: int, M=1e4):
         """Executa o modelo linearizado estático"""
+
+        # Verificações de parâmetros obrigatórios
+        if user_id is None or not isinstance(user_id, int):
+            raise ValueError("user_id must be provided and must be an integer.")
+        if scenario_id is None or not isinstance(scenario_id, int):
+            raise ValueError("scenario_id must be provided and must be an integer.")
+        if M is None or not isinstance(M, (int, float)) or M <= 0:
+            raise ValueError("M must be a positive number.")
+
+        # Verifica se o cenário pertence ao usuário
+        scenario = self.scenario_repo.get_by_id(scenario_id)
+        if not scenario or scenario.user_id != user_id:
+            raise ValueError("Scenario not found or access denied.")
+        
         P, W, R, B, CC, TC, Qmax, CAP, Cope, FCmax, Cesp, Caglo, Ctran, FT = self.extract_scenario_data(scenario_id)
 
         model = pulp.LpProblem("Static_Bus_Allocation", pulp.LpMinimize)
@@ -174,24 +189,6 @@ class SolverService:
         return {
             "status": "Completed",
             "objective_value": pulp.value(model.objective),
-            "solution_data": {
-                "variables": {
-                    "v": {f"{b}_{r}": pulp.value(v[(b, r)]) for b in B for r in R},
-                    "f": {f"{b}_{r}": pulp.value(f[(b, r)]) for b in B for r in R},
-                    "q": {f"{b}_{r}": pulp.value(q[(b, r)]) for b in B for r in R},
-                    "y": {str(r): pulp.value(y[r]) for r in R},
-                    "u": {str(b): pulp.value(u[b]) for b in B},
-                    "w": {str(r): pulp.value(w[r]) for r in R},
-                    "z": {str(r): pulp.value(z[r]) for r in R},
-                    "H": {str(r): pulp.value(H[r]) for r in R}
-                }
-            },
-            "parameters_solution": {
-                "P": P,
-                "W": W,
-                "alpha": alpha,
-                "M": M,
-                "total_fleet": total_fleet,
-                "k_max": k_max
-            }
+            "solution_data": solution_data,
+            "parameters_solution": parameters_solution
         }

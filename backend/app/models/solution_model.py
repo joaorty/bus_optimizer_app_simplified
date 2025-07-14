@@ -21,7 +21,7 @@ class Solution(Base):
     solution_data = Column(JSON)
     parameters_solution = Column(JSON)
 
-    scenario = relationship("Scenario", back_populates="solutions")
+    scenario = relationship("Scenario", back_populates="solution")
 
     def __init__(self, scenario_id, status=SolutionStatus.pending, objective_value=None, solution_data=None, parameters_solution=None):
         self.scenario_id = scenario_id

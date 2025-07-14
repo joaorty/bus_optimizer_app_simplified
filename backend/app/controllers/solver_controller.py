@@ -1,6 +1,5 @@
 from flask import Blueprint, jsonify, request
 from app.services.solver_service import SolverService
-from app import db  # sua instância do SQLAlchemy (flask_sqlalchemy)
 
 bp = Blueprint("solver", __name__, url_prefix="/api/solver")
 solver_service = SolverService()
@@ -8,13 +7,12 @@ solver_service = SolverService()
 @bp.route("/run-static-model", methods=["POST"])
 def run_static_model():
     data = request.json
-    scenario_id = data.get("scenario_id")
-
-    if not isinstance(scenario_id, int):
-        return jsonify({"error": "scenario_id must be an integer."}), 400
+    user_id = data.get( "user_id" )
+    scenario_id = data.get( "scenario_id" )
+    M = data.get("M")
 
     try:
-        result = solver_service.run_model_linearized_static(scenario_id, db.session)
+        result = solver_service.run_model_linearized_static(user_id, scenario_id, M)
         return jsonify({"success": True, "result": result}), 200
     except ValueError as e:
         return jsonify({"success": False, "error": str(e)}), 404
