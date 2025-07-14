@@ -1,9 +1,10 @@
 import streamlit as st
 from utils.dashboard_tools import gerar_dashboard
-
+from modules.auth import require_login
 from modules.nav import Navbar
 
 Navbar()
+require_login()
 
 st.title("📊 Dashboards dos Cenários")
 
