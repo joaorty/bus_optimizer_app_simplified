@@ -46,7 +46,7 @@ parameters["accetable_time_transfer"] = st.number_input("Custo de tempo de esper
 
 if st.button("Otimizar"):
   response = requests.post(
-    API_URL + "solver/run_static_model/",
+    API_URL + "solver/run_static_model",
     json={
       "name_scenario": name_scenario,
       "bus_types": bus_types,

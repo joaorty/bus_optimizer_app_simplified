@@ -20,19 +20,21 @@ def main():
         "usernames": {}
       }
 
+      usuarios_por_email = {u["email"]: u for u in usuarios}
+
       for u in usuarios:
         credentials["usernames"][u["email"]] = {
           "name": u["name"],
-          "password": u["password_hash"]  # Já é hash bcrypt
+          "password": u["password_hash"]  # Já é hash bcrypt,
         }
 
-      return credentials
+      return credentials, usuarios_por_email  
 
     except Exception as e:
       st.error(f"⚠️ Erro ao carregar usuários da API Flask: {e}")
       st.stop()
 
-  credentials = carregar_usuarios_da_api()
+  credentials, usuarios_por_email = carregar_usuarios_da_api()
 
   authenticator = stauth.Authenticate(
     credentials,
@@ -47,6 +49,7 @@ def main():
       st.error(e)
 
   if st.session_state.get('authentication_status'):
+      st.session_state["user_id"] = usuarios_por_email[st.session_state.get("username")]["id"]
       authenticator.logout()
       Navbar()
       st.title('🚌 Sistema de Alocação de Ônibus')
