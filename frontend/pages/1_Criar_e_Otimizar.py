@@ -42,21 +42,37 @@ parameters = dict()
 parameters["time_unit_of_periods"] = st.number_input("Tempo do período (minutos)", min_value=0, value=60, step=1)
 parameters["accetable_time_transfer"] = st.number_input("Tempo aceitável de transferência (minutos)", min_value=0, step=1)
 parameters["agglomeration_cost"] = st.number_input("Custo de aglomeração", min_value=0.0, value=1.0, step=0.5)
-parameters["accetable_time_transfer"] = st.number_input("Custo de tempo de espera", min_value=0.0, value=1.0, step=0.5)
+parameters["wait_cost"] = st.number_input("Custo de tempo de espera", min_value=0.0, value=1.0, step=0.5)
 
 if st.button("Otimizar"):
+  print({
+      "name_scenario": name_scenario,
+      "bus_types": bus_types,
+      "routes": routes,
+      "parameters": parameters,
+      "mode": "manual",
+      "user_id": st.session_state.get("user_id"),
+    })
   response = requests.post(
-    API_URL + "solver/run_static_model",
+    API_URL + "solver/run-static-model",
     json={
       "name_scenario": name_scenario,
       "bus_types": bus_types,
       "routes": routes,
       "parameters": parameters,
-      "mode": "manual"
+      "mode": "manual",
+      "user_id": st.session_state.get("user_id"),
     }
   )
   if response.ok:
     st.success("Cenário enviado para otimização com sucesso!")
     st.json(response.json())
   else:
-    st.error("Erro ao enviar cenário para otimização.")
+    st.error(f"Erro {response.status_code} ao enviar cenário para otimização.")
+    
+    # Tenta exibir o JSON se possível
+    try:
+      st.json(response.json())
+    except Exception:
+      st.write("Resposta bruta da API:")
+      st.code(response.text)

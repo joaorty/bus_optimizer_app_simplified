@@ -33,7 +33,7 @@ class ScenarioService:
         if db_session is None:
             raise ValueError("db_session must be provided.")
 
-        scenarios = self.repository.find_all_by(user_id=user_id)
+        scenarios = self.repository.find_all_by(user_id, db_session)
         if not scenarios:
             raise ValueError("No scenarios found for this user.")
         return [scenario.to_dict() for scenario in scenarios]

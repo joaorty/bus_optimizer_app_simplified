@@ -10,6 +10,9 @@ def create_scenario():
     user_id = data.get("user_id")
     name = data.get("name")
     description = data.get("description")
+    list_routes = data.get("routes", [])
+    bus_types = data.get("bus_types", [])
+    parameters = data.get("parameters", {})
 
     try:
         scenario = scenario_service.create(user_id=user_id, name=name, description=description)
