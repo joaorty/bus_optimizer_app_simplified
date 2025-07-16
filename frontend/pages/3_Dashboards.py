@@ -37,7 +37,6 @@ if st.button("Gerar Dashboard"):
       "Demanda & Rotas",
       "Tipos de Ônibus",
       "Solução & Headway",
-      "Parâmetros & Objetivo"
     ])
 
     # 1. Demanda & Rotas
@@ -66,22 +65,6 @@ if st.button("Gerar Dashboard"):
           col2.info("Sem dados de headway.")
       else:
         st.info("Sem dados da solução otimizada.")
-
-    # 4. Parâmetros & Objetivo
-    with tabs[3]:
-      parametros = dados_cenario.get("parameters", [])
-      if parametros:
-        st.subheader("⚙️ Parâmetros do Modelo")
-        st.json(parametros[0])
-      else:
-        st.info("Sem parâmetros disponíveis.")
-
-      solutions = dados_cenario.get("solution", {})
-      print( solutions )
-      if solutions.get("objective_value") is not None:
-        st.metric("🎯 Valor Objetivo da Solução", round(solutions["objective_value"], 2))
-      else:
-        st.info("Sem valor objetivo disponível.")
 
   except Exception as e:
     st.error(f"Erro ao gerar dashboard: {e}")
