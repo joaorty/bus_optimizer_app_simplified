@@ -15,7 +15,7 @@ cenarios = carregar_cenarios(user_id)
 
 if not cenarios:
   st.warning("Você ainda não criou nenhum cenário.")
-  st.markdown("👉 [Clique aqui para criar um novo cenário](./Criar_Cenarios)")
+  st.markdown("👉 [Clique aqui para criar um novo cenário](./Criar_e_Otimizar)")
   st.stop()
 
 selected = st.selectbox("Escolha um cenário", list(cenarios.keys()))

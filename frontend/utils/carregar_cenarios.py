@@ -9,7 +9,7 @@ def carregar_cenarios(user_id):
         data = response.json()
 
         if not data["success"]:
-            raise Exception("Erro na API: 'success' é False.")
+            raise Exception(f"Erro na API: 'success' é False. Detalhes: {data.get('error', 'Unknown error')}")
 
         return data["cenarios"]
 

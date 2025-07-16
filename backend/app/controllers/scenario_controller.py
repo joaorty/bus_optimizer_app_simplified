@@ -41,11 +41,8 @@ def get_all_scenarios():
     user_id = request.args.get("user_id", type=int)
 
     try:
-        from app import db  # se necessário importar aqui
-        scenarios = scenario_service.get_all(user_id=user_id, db_session=db.session)
-        return jsonify({"success": True, "scenarios": scenarios}), 200
-    except ValueError as e:
-        return jsonify({"success": False, "error": str(e)}), 404
+        scenarios = scenario_service.get_all(user_id=user_id)
+        return jsonify({"success": True, "cenarios": scenarios}), 200
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
