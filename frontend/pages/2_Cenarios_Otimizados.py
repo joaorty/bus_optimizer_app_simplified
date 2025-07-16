@@ -1,5 +1,5 @@
 import streamlit as st
-from utils import require_login, Navbar, carregar_cenarios, Icon
+from utils import get_authenticator, Navbar, carregar_cenarios, Icon
 import requests
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
 import pandas as pd
@@ -9,11 +9,21 @@ from datetime import datetime
 # Setup
 Icon()
 Navbar()
-require_login()
+
+authenticator, usuarios_por_email = get_authenticator()
+
+if st.session_state.get("authentication_status"):
+  user_id = usuarios_por_email[st.session_state["username"]]["id"]
+  st.session_state["user_id"] = user_id
+else:
+  st.warning("⚠️ Você precisa estar logado para acessar esta página.")
+  st.stop()
+
+
+
 st.title("📁 Cenários")
 user_id = st.session_state.get("user_id")
 
-# Carregar cenários (mock ou real)
 cenarios = carregar_cenarios(user_id=user_id)
 
 if not cenarios:
