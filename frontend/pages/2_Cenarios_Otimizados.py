@@ -3,81 +3,92 @@ from utils import require_login, Navbar, carregar_cenarios, Icon
 import requests
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
 import pandas as pd
+from config import API_URL
+from datetime import datetime
 
+# Setup
 Icon()
 Navbar()
 require_login()
-
 st.title("📁 Cenários")
-
 user_id = st.session_state.get("user_id")
 
-cenarios = carregar_cenarios(user_id)
+# Carregar cenários (mock ou real)
+cenarios = carregar_cenarios(user_id=user_id)
 
 if not cenarios:
   st.warning("Você ainda não criou nenhum cenário.")
   st.markdown("👉 [Clique aqui para criar um novo cenário](./Criar_e_Otimizar)")
   st.stop()
 
-selected = st.selectbox("Escolha um cenário", list(cenarios.keys()))
-# Monta DataFrame dos cenários
+# Criar DataFrame da tabela
 cenarios_df = pd.DataFrame([
-    {
-        "Nome": nome,
-        "Status": cenario.get("status", "Desconhecido"),
-        "Visualizar": "Visualizar",
-        "Excluir": "Excluir"
-    }
-    for nome, cenario in cenarios.items()
+  {"Nome": nome, "Status": cenario.get("solution", {}).get("status", "Não otimizado")}
+  for nome, cenario in cenarios.items()
 ])
 
-# Configura AgGrid
+# Inicializa estado
+if "cenario_selecionado" not in st.session_state:
+  st.session_state["cenario_selecionado"] = None
+if "visualizar_cenario" not in st.session_state:
+  st.session_state["visualizar_cenario"] = False
+
+# Tabela AgGrid
+st.subheader("📋 Tabela de Cenários")
 gb = GridOptionsBuilder.from_dataframe(cenarios_df)
-gb.configure_column("Visualizar", editable=False, cellRenderer='buttonRenderer')
-gb.configure_column("Excluir", editable=False, cellRenderer='buttonRenderer')
-gb.configure_selection('single')
+gb.configure_selection("single")
 grid_options = gb.build()
 
-# Função customizada para botões
-def button_renderer(params):
-    return f'<button>{params.value}</button>'
-
-# Exibe tabela interativa
 response = AgGrid(
-    cenarios_df,
-    gridOptions=grid_options,
-    update_mode=GridUpdateMode.MODEL_CHANGED,
-    allow_unsafe_jscode=True,
-    fit_columns_on_grid_load=True,
-    enable_enterprise_modules=False
+  cenarios_df,
+  gridOptions=grid_options,
+  update_mode=GridUpdateMode.SELECTION_CHANGED,
+  fit_columns_on_grid_load=True
 )
 
-# Lida com ações dos botões
-if response['selected_rows']:
-    selected_row = response['selected_rows'][0]
-    selected = selected_row['Nome']
+# Quando selecionar linha, atualizar estado
+selected_rows = response.get("selected_rows")
+if selected_rows is not None and len(selected_rows) > 0:
+  nome = selected_rows.iloc[0]["Nome"]
+  st.session_state["cenario_selecionado"] = nome
+  st.session_state["visualizar_cenario"] = False  # reset visualização
 
-    # Botão Visualizar
-    if st.button(f"Visualizar '{selected}'"):
-        cenario = cenarios[selected]
-        # Tabela de rotas
-        if "rotas" in cenario:
-            st.subheader("Rotas")
-            st.dataframe(pd.DataFrame(cenario["rotas"]))
-        # Tabela de tipos de ônibus
-        if "tipos_onibus" in cenario:
-            st.subheader("Tipos de Ônibus")
-            st.dataframe(pd.DataFrame(cenario["tipos_onibus"]))
-        # Parâmetros
-        if "parametros" in cenario:
-            st.subheader("Parâmetros")
-            st.json(cenario["parametros"])
-
-    # Botão Excluir
-    if st.button(f"Excluir '{selected}'"):
-        del cenarios[selected]
-        st.success(f"Cenário '{selected}' excluído.")
-        # Aqui você pode salvar novamente os cenários se necessário
+# Se algum cenário foi selecionado
+selected = st.session_state["cenario_selecionado"]
 if selected:
-    st.subheader(f"Cenário: {selected}")
-    st.json(cenarios[selected])
+  st.markdown(f"### 🔧 Ações para o cenário: `{selected}`")
+  col1, col2 = st.columns(2)
+
+  with col1:
+    if st.button("👁️ Visualizar detalhes"):
+      st.session_state["visualizar_cenario"] = True
+
+  with col2:
+    if st.button("🗑️ Excluir cenário"):
+      cenario_id = cenarios[selected]["id"]
+      resposta = requests.delete(f"{API_URL}/api/scenarios/delete/{cenario_id}", json={"user_id": user_id})
+      if resposta.status_code == 200:
+        st.success(f"Cenário `{selected}` excluído com sucesso.")
+        del cenarios[selected]
+        st.session_state["cenario_selecionado"] = None
+        st.session_state["visualizar_cenario"] = False
+        st.experimental_rerun()
+      else:
+        st.error(f"Erro ao excluir cenário: {resposta.status_code} - {resposta.text}")
+
+# Mostrar detalhes apenas se clicado em visualizar
+if st.session_state["visualizar_cenario"] and selected:
+  cenario = cenarios[selected]
+  st.subheader("📊 Detalhes do Cenário")
+
+  if "routes" in cenario:
+    st.markdown("**🛣️ Rotas**")
+    st.dataframe(pd.DataFrame(cenario["routes"]))
+
+  if "bus_types" in cenario:
+    st.markdown("**🚌 Tipos de Ônibus**")
+    st.dataframe(pd.DataFrame(cenario["bus_types"]))
+
+  if "parameters" in cenario:
+    st.markdown("**⚙️ Parâmetros**")
+    st.json(cenario["parameters"][0])

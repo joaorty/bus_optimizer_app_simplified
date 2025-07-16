@@ -65,7 +65,7 @@ def update_scenario(scenario_id):
 
 @bp.route("/delete/<int:scenario_id>", methods=["DELETE"])
 def delete_scenario(scenario_id):
-    user_id = request.args.get("user_id", type=int)
+    user_id = request.json.get("user_id")
 
     try:
         result = scenario_service.delete(user_id=user_id, scenario_id=scenario_id)

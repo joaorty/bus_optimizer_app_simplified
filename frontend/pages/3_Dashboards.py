@@ -60,8 +60,6 @@ if st.button("Gerar Dashboard"):
 
     # 4. Parâmetros & Objetivo
     with tabs[3]:
-      # Exibe métricas e parâmetros (essas partes devem estar sendo renderizadas dentro do gerar_dashboard)
-      # Se não, pode retornar separadamente e exibir aqui
       parametros = dados_cenario.get("parameters", [])
       if parametros:
         st.subheader("⚙️ Parâmetros do Modelo")
