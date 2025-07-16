@@ -28,7 +28,7 @@ def create_scenario():
 
 @bp.route("/get/<int:scenario_id>", methods=["GET"])
 def get_scenario(scenario_id):
-    user_id = request.args.get("user_id", type=int)
+    user_id = request.args.get("user_id")
 
     try:
         scenario = scenario_service.get_by_id(user_id=user_id, scenario_id=scenario_id)
@@ -41,7 +41,7 @@ def get_scenario(scenario_id):
 
 @bp.route("/get_all", methods=["GET"])
 def get_all_scenarios():
-    user_id = request.args.get("user_id", type=int)
+    user_id = request.args.get("user_id")
 
     try:
         scenarios = scenario_service.get_all(user_id=user_id)

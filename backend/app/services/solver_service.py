@@ -51,15 +51,14 @@ class SolverService:
     def common_variables_static(self, B, R):
         """Cria variáveis comuns do modelo estático"""
         v = pulp.LpVariable.dicts("v", [(b, r) for b in B for r in R], lowBound=0, cat='Integer')
-        f = pulp.LpVariable.dicts("f", [(b, r) for b in B for r in R], lowBound=0, cat='Continuous')
+        f = pulp.LpVariable.dicts("f", [(b, r) for b in B for r in R], lowBound=0, cat='Integer')
         q = pulp.LpVariable.dicts("q", [(b, r) for b in B for r in R], lowBound=0, cat='Continuous')
         y = pulp.LpVariable.dicts("y", R, cat='Binary')
-        u = pulp.LpVariable.dicts("u", B, lowBound=0, cat='Integer')
         e = pulp.LpVariable.dicts("e", [(b, r) for b in B for r in R], lowBound=0, cat='Continuous')
         w = pulp.LpVariable.dicts("w", R, lowBound=0, cat='Continuous')
         z = pulp.LpVariable.dicts("z", R, lowBound=0, cat='Continuous')
         H = pulp.LpVariable.dicts("H", R, lowBound=0, cat='Continuous')
-        return v, f, q, y, u, e, w, z, H
+        return v, f, q, y, e, w, z, H
 
     def run_model_linearized_static(self, user_id: int, scenario_id: int, M=1e4):
         """Executa o modelo linearizado estático"""
@@ -80,9 +79,9 @@ class SolverService:
         P, W, R, B, CC, TC, Qmax, CAP, Cope, FCmax, Cesp, Caglo, Ctran, FT = self.extract_scenario_data(scenario_id)
 
         model = pulp.LpProblem("Static_Bus_Allocation", pulp.LpMinimize)
-        v, f, q, y, u, e, w, z, H = self.common_variables_static(B, R)
+        v, f, q, y, e, w, z, H = self.common_variables_static(B, R)
 
-        alpha = 5
+        alpha = 2
         effective_capacity = [round(FCmax[b] * CAP[b]) for b in B]
         min_effective_capacity = min(effective_capacity)
         total_fleet = int(sum(FT[b] for b in B))
@@ -123,8 +122,11 @@ class SolverService:
         for r in R:
             model += pulp.lpSum(f[(b, r)] for b in B) == pulp.lpSum(k * delta_tot[(k, r)] for k in K_total[r])
             model += pulp.lpSum((P / k) * delta_tot[(k, r)] for k in K_total[r]) == H[r]
+            
             model += (H[r] / 2 <= W + (P - W) * y[r])
+
             model += pulp.lpSum(delta_tot[(k, r)] for k in K_total[r]) == 1
+
             model += w[r] <= pulp.lpSum(q[(b, r)] for b in B)
             model += w[r] <= Qmax[r] * y[r]
             model += w[r] >= pulp.lpSum(q[(b, r)] for b in B) - Qmax[r] * (1 - y[r])
@@ -135,18 +137,20 @@ class SolverService:
                 model += q[(b, r)] <= FCmax[b] * CAP[b] * f[(b, r)]
                 model += e[(b, r)] >= q[(b, r)] - CAP[b] * f[(b, r)]
                 model += e[(b, r)] >= 0
-                model += v[(b, r)] == f[(b, r)] if TC[r] > P else v[(b, r)] == floor(P / TC[r]) * f[(b, r)]
+                if TC[r] > P:
+                    model += v[(b, r)] == f[(b, r)]
+                else:
+                    model += v[(b, r)] == floor(P / TC[r]) * f[(b, r)]
 
         for r in R:
             model += pulp.lpSum(q[(b, r)] for b in B) <= Qmax[r]
 
         for b in B:
             model += pulp.lpSum(v[(b, r)] for r in R) <= FT[b]
-            model += u[b] == pulp.lpSum(v[(b, r)] for r in R)
-            model += u[b] <= FT[b]
+
 
         # Resolver modelo
-        model.solve()
+        model.solve(pulp.PULP_CBC_CMD(msg=True))
 
         if model.status != pulp.LpStatusOptimal:
             raise RuntimeError(f"Optimization failed with status: {pulp.LpStatus[model.status]}")
@@ -158,7 +162,6 @@ class SolverService:
                 "f": {f"{b}_{r}": pulp.value(f[(b, r)]) for b in B for r in R},
                 "q": {f"{b}_{r}": pulp.value(q[(b, r)]) for b in B for r in R},
                 "y": {str(r): pulp.value(y[r]) for r in R},
-                "u": {str(b): pulp.value(u[b]) for b in B},
                 "w": {str(r): pulp.value(w[r]) for r in R},
                 "z": {str(r): pulp.value(z[r]) for r in R},
                 "H": {str(r): pulp.value(H[r]) for r in R}

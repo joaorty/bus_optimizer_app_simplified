@@ -66,7 +66,7 @@ if selected:
   with col2:
     if st.button("🗑️ Excluir cenário"):
       cenario_id = cenarios[selected]["id"]
-      resposta = requests.delete(f"{API_URL}/api/scenarios/delete/{cenario_id}", json={"user_id": user_id})
+      resposta = requests.delete(f"{API_URL}scenarios/delete/{cenario_id}", json={"user_id": user_id})
       if resposta.status_code == 200:
         st.success(f"Cenário `{selected}` excluído com sucesso.")
         del cenarios[selected]
