@@ -46,14 +46,14 @@ parameters["agglomeration_cost"] = st.number_input("Custo de aglomeração", min
 parameters["wait_cost"] = st.number_input("Custo de tempo de espera", min_value=0.0, value=1.0, step=0.5)
 
 if st.button("Otimizar"):
-  print({
-      "name_scenario": name_scenario,
-      "bus_types": bus_types,
-      "routes": routes,
-      "parameters": parameters,
-      "mode": "manual",
-      "user_id": st.session_state.get("user_id"),
-    })
+  # print({
+  #     "name_scenario": name_scenario,
+  #     "bus_types": bus_types,
+  #     "routes": routes,
+  #     "parameters": parameters,
+  #     "mode": "manual",
+  #     "user_id": st.session_state.get("user_id"),
+  #   })
   response = requests.post(
     API_URL + "solver/run-static-model",
     json={

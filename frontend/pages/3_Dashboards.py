@@ -14,13 +14,14 @@ if not cenarios:
   st.markdown("👉 [Clique aqui para criar um novo cenário](./Criar_e_Otimizar)")
   st.stop()
 
-nomes_cenarios = list(cenarios.keys())
+nomes_cenarios = [ cenario.get( "name" ) for cenario in cenarios ]
 
 cenario_selecionado = st.selectbox("Selecione um cenário", nomes_cenarios)
 
 if st.button("Gerar Dashboard"):
   try:
-    dados_cenario = cenarios[cenario_selecionado]
+    indice = nomes_cenarios.index(cenario_selecionado)
+    dados_cenario = cenarios[indice]
     figs = gerar_dashboard(dados_cenario)  # lista de figuras
 
     # Criar abas para separar gráficos
@@ -68,6 +69,7 @@ if st.button("Gerar Dashboard"):
         st.info("Sem parâmetros disponíveis.")
 
       solutions = dados_cenario.get("solutions", [])
+      print( solutions )
       if solutions and solutions[0].get("objective_value") is not None:
         st.metric("🎯 Valor Objetivo da Solução", round(solutions[0]["objective_value"], 2))
       else:
