@@ -70,13 +70,13 @@ if selected:
     indice = next((i for i, c in enumerate(cenarios) if c.get("name") == selected), None)
     if st.button("🗑️ Excluir cenário"):
       cenario_id = cenarios[indice]["id"]
-      resposta = requests.delete(f"{API_URL}/api/scenarios/delete/{cenario_id}", json={"user_id": user_id})
+      resposta = requests.delete(f"{API_URL}scenarios/delete/{cenario_id}", json={"user_id": user_id})
       if resposta.status_code == 200:
         st.success(f"Cenário `{selected}` excluído com sucesso.")
         del cenarios[indice]
         st.session_state["cenario_selecionado"] = None
         st.session_state["visualizar_cenario"] = False
-        st.experimental_rerun()
+        st.rerun()
       else:
         st.error(f"Erro ao excluir cenário: {resposta.status_code} - {resposta.text}")
 

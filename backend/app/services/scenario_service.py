@@ -93,5 +93,5 @@ class ScenarioService:
         scenario = self.scenario_repository.get_by_id(scenario_id)
         if not scenario or scenario.user_id != user_id:
             raise ValueError("Scenario not found or access denied.")
-        self.scenario_repository.delete_with_session(scenario)
+        self.scenario_repository.delete(scenario)
         return {"message": "Scenario deleted successfully."}
