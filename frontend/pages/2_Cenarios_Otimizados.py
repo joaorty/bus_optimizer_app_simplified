@@ -35,7 +35,7 @@ if not cenarios:
 cenarios_df = pd.DataFrame([
     {
         "Nome": cenario.get("name", "Sem nome"),
-        "Status": cenario.get("solution", {}).get("status", "Não otimizado")
+        "Status": (cenario.get("solution") or {}).get("status", "Não otimizado")
     }
     for cenario in cenarios if cenario is not None
 ])
