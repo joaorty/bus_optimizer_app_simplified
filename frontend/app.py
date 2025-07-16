@@ -1,5 +1,6 @@
 import streamlit as st
-import streamlit_authenticator as stauth
+from utils import carregar_usuarios_da_api
+from utils import get_authenticator
 import requests
 from utils import Navbar
 from config import API_URL
@@ -11,51 +12,12 @@ def main():
     page_icon="🚌",  # opcional
   )
 
-  @st.cache_data(ttl=300)
-  def carregar_usuarios_da_api():
-    """Consulta a API Flask e monta as credenciais para o streamlit-authenticator"""
-    try:
-      response = requests.get(f"{API_URL}users/")
-      data = response.json()
-
-      if not data["success"]:
-        raise Exception("Erro na API: 'success' é False.")
-
-      usuarios = data["users"]
-      credentials = {
-        "usernames": {}
-      }
-
-      usuarios_por_email = {u["email"]: u for u in usuarios}
-
-      for u in usuarios:
-        credentials["usernames"][u["email"]] = {
-          "name": u["name"],
-          "password": u["password_hash"]  # Já é hash bcrypt,
-        }
-
-      return credentials, usuarios_por_email  
-
-    except Exception as e:
-      st.error(f"⚠️ Erro ao carregar usuários da API Flask: {e}")
-      st.stop()
-
-  credentials, usuarios_por_email = carregar_usuarios_da_api()
-
-  # print( credentials )
-  # print( usuarios_por_email )
-
-  authenticator = stauth.Authenticate(
-    credentials,
-    cookie_name="auth_cookie",
-    key="signature_key",
-    cookie_expiry_days=1
-  )
+  authenticator, usuarios_por_email = get_authenticator()
 
   try:
-      authenticator.login()
+    authenticator.login()
   except Exception as e:
-      st.error(e)
+    st.error(f"Erro no login: {e}")
 
   if st.session_state.get('authentication_status'):
       st.session_state["user_id"] = usuarios_por_email[st.session_state.get("username")]["id"]

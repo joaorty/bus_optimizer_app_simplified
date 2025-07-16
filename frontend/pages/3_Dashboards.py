@@ -1,9 +1,17 @@
 import streamlit as st
-from utils import require_login, carregar_cenarios, Navbar, gerar_dashboard, Icon
+from utils import get_authenticator, carregar_cenarios, Navbar, gerar_dashboard, Icon
 
 Icon()
 Navbar()
-require_login()
+authenticator, usuarios_por_email = get_authenticator()
+
+if st.session_state.get("authentication_status"):
+  user_id = usuarios_por_email[st.session_state["username"]]["id"]
+  st.session_state["user_id"] = user_id
+else:
+  st.warning("⚠️ Você precisa estar logado para acessar esta página.")
+  st.stop()
+
 
 st.title("📊 Dashboards dos Cenários")
 
