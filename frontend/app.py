@@ -36,6 +36,9 @@ def main():
 
   credentials, usuarios_por_email = carregar_usuarios_da_api()
 
+  print( credentials )
+  print( usuarios_por_email )
+
   authenticator = stauth.Authenticate(
     credentials,
     cookie_name="auth_cookie",

@@ -15,34 +15,34 @@ class SolverService:
 
     def extract_scenario_data(self, scenario_id):
         """Extrai dados do cenário usando repositórios"""
-        params = self.parameters_repo.get_by_filter( scenario_id=scenario_id )
+        params = self.parameters_repo.find_first_by( scenario_id=scenario_id )
         if not params:
             raise ValueError("Parameters not found for scenario")
 
-        routes = self.route_repo.list_by_filter( scenario_id=scenario_id )
+        routes = self.route_repo.find_all_by( scenario_id=scenario_id )
         if not routes:
             raise ValueError("Routes not found for scenario")
 
-        bus_types = self.bus_type_repo.list_by_filter( scenario_id=scenario_id )
+        bus_types = self.bus_type_repo.find_all_by( scenario_id=scenario_id )
         if not bus_types:
             raise ValueError("Bus types not found for scenario")
 
-        P = params.units_time
-        W = params.wait_cost
-        Ctran = params.acceptable_time_transfer
-        Caglo = params.agglomeration_cost
+        P = int( params.units_time )
+        W = float( params.wait_cost )
+        Ctran = int( params.acceptable_time_transfer )
+        Caglo = int( params.agglomeration_cost )
 
         R = [route.id for route in routes]
         B = [bus.id for bus in bus_types]
 
-        CC = {route.id: route.length_km for route in routes}
-        TC = {route.id: route.time_minutes for route in routes}
-        Qmax = {route.id: route.passengers for route in routes}
+        CC = {route.id: int( route.length_km ) for route in routes}
+        TC = {route.id: int( route.time_minutes ) for route in routes}
+        Qmax = {route.id: int( route.passengers ) for route in routes}
 
-        CAP = {bus.id: bus.seat_capacity for bus in bus_types}
-        Cope = {bus.id: bus.operational_cost_km for bus in bus_types}
-        FCmax = {bus.id: bus.load_factor for bus in bus_types}
-        FT = {bus.id: bus.available_units for bus in bus_types}
+        CAP = {bus.id: int( bus.seat_capacity ) for bus in bus_types}
+        Cope = {bus.id: float( bus.operational_cost_km ) for bus in bus_types}
+        FCmax = {bus.id: float( bus.load_factor ) for bus in bus_types}
+        FT = {bus.id: int( bus.available_units ) for bus in bus_types}
 
         Cesp = 1.0
 

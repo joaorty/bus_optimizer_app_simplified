@@ -19,8 +19,8 @@ bus_types = []
 for i in range(num_types):
   with st.expander(f"Tipo de ônibus {i+1}"):
     tipo = {
-      "operational_cost": st.number_input("Custo operacional por km (R$)", min_value=0.0, value=1.0, key=f"custo_{i}"),
-      "capacity": st.number_input("Quantidade de assentos", min_value=1, value=50, step=50, key=f"assentos_{i}"),
+      "operational_cost_km": st.number_input("Custo operacional por km (R$)", min_value=0.0, value=1.0, key=f"custo_{i}"),
+      "seat_capacity": st.number_input("Quantidade de assentos", min_value=1, value=50, step=50, key=f"assentos_{i}"),
       "available_units": st.number_input("Quantidade de ônibus disponíveis", min_value=0, value=10, step=10, key=f"qtd_{i}"),
       "load_factor": st.number_input("Fator máximo de ocupação", min_value=1.0, value=1.0, step=0.1, key=f"fator_{i}")
     }
@@ -39,8 +39,8 @@ for i in range(num_routes):
 
 # Sobre os parametros
 parameters = dict()
-parameters["time_unit_of_periods"] = st.number_input("Tempo do período (minutos)", min_value=0, value=60, step=1)
-parameters["accetable_time_transfer"] = st.number_input("Tempo aceitável de transferência (minutos)", min_value=0, step=1)
+parameters["units_time"] = st.number_input("Tempo do período (minutos)", min_value=0, value=60, step=1)
+parameters["acceptable_time_transfer"] = st.number_input("Tempo aceitável de transferência (minutos)", min_value=0, step=1)
 parameters["agglomeration_cost"] = st.number_input("Custo de aglomeração", min_value=0.0, value=1.0, step=0.5)
 parameters["wait_cost"] = st.number_input("Custo de tempo de espera", min_value=0.0, value=1.0, step=0.5)
 

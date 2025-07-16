@@ -1,5 +1,5 @@
 services:
-  backend:
+  basa_backend:
     build:
       context: .
       dockerfile: Dockerfile
@@ -8,13 +8,13 @@ services:
     volumes:
       - .:/app
     depends_on:
-      - db
+      - basa_db
     env_file:
       - .env
     networks:
       - bus-allocation-network
 
-  db:
+  basa_db:
     image: postgres:17  
     environment:
       - POSTGRES_USER=postgres
