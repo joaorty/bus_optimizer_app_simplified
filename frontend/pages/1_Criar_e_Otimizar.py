@@ -33,7 +33,7 @@ for i in range(num_routes):
   with st.expander(f"Rota {i+1}"):
     route = {
       "length_km": st.number_input("Comprimento da rota (km)", min_value=0.50, step=0.50,key=f"comprimento_{i}"),
-      "time_minutes": st.number_input("Tempo de viagem (minutos)", min_value=1, key=f"tempo_{i}"),
+      "time_minutes": st.number_input("Tempo de viagem (minutos)", min_value=1, value=30, step=15, key=f"tempo_{i}"),
       "passengers": st.number_input("Número de passageiros", min_value=1, value=50, step=50, key=f"passageiros_{i}")
     }
     routes.append(route)
