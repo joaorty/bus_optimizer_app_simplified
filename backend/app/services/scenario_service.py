@@ -34,9 +34,7 @@ class ScenarioService:
             raise ValueError("db_session must be provided.")
 
         scenarios = self.repository.find_all_by(user_id, db_session)
-        if not scenarios:
-            raise ValueError("No scenarios found for this user.")
-        return [scenario.to_dict() for scenario in scenarios]
+        return [scenario.to_dict() for scenario in scenarios] if scenarios else []
 
     def update(self, user_id: int, scenario_id: int, name: str = None, description: str = None):
         if user_id is None or not isinstance(user_id, int):

@@ -12,6 +12,12 @@ st.title("📁 Cenários")
 user_id = st.session_state.get("user_id")
 
 cenarios = carregar_cenarios(user_id)
+
+if not cenarios:
+  st.warning("Você ainda não criou nenhum cenário.")
+  st.markdown("👉 [Clique aqui para criar um novo cenário](./Criar_Cenarios)")
+  st.stop()
+
 selected = st.selectbox("Escolha um cenário", list(cenarios.keys()))
 # Monta DataFrame dos cenários
 cenarios_df = pd.DataFrame([
