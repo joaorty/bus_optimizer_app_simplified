@@ -14,7 +14,7 @@ class Scenario(Base):
 
     solver_user = relationship("SolverUser", back_populates="scenarios")
     routes = relationship("Route", back_populates="scenario", cascade="all, delete-orphan")
-    solution = relationship("Solution", uselist=False, back_populates="scenario", cascade="all, delete-orphan")
+    solutions = relationship("Solution", back_populates="scenario", cascade="all, delete-orphan")
     bus_types = relationship("BusType", back_populates="scenario", cascade="all, delete-orphan")
     parameters = relationship("Parameters", back_populates="scenario", cascade="all, delete-orphan")
 
@@ -35,7 +35,7 @@ class Scenario(Base):
             "created_at": self.created_at,
             "updated_at": self.updated_at,
             "routes": [route.to_dict() for route in self.routes],
-            "solution": self.solution.to_dict() if self.solution else None,
+            "solutions": [solution.to_dict() for solution in self.solutions],
             "bus_types": [bus_type.to_dict() for bus_type in self.bus_types],
             "parameters": [parameter.to_dict() for parameter in self.parameters],
         }

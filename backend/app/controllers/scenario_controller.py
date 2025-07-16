@@ -15,7 +15,10 @@ def create_scenario():
     parameters = data.get("parameters", {})
 
     try:
-        scenario = scenario_service.create(user_id=user_id, name=name, description=description)
+        scenario = scenario_service.create(
+            user_id=user_id, name=name, description=description,
+            list_routes = list_routes, bus_types = bus_types, parameters = parameters
+        )
         return jsonify({"success": True, "scenario": scenario}), 201
     except ValueError as e:
         return jsonify({"success": False, "error": str(e)}), 404
