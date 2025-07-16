@@ -1,18 +1,20 @@
 import streamlit as st
 from utils import require_login, carregar_cenarios, Navbar, gerar_dashboard, Icon
 
-Navbar()
 Icon()
+Navbar()
 require_login()
 
 st.title("📊 Dashboards dos Cenários")
 
-cenarios = carregar_cenarios()
-nomes_cenarios = list(cenarios.keys())
+cenarios = carregar_cenarios(user_id=st.session_state.get("user_id"))
 
-if not nomes_cenarios:
-  st.warning("⚠️ Nenhum cenário disponível.")
+if not cenarios:
+  st.warning("Você ainda não criou nenhum cenário.")
+  st.markdown("👉 [Clique aqui para criar um novo cenário](./Criar_e_Otimizar)")
   st.stop()
+
+nomes_cenarios = list(cenarios.keys())
 
 cenario_selecionado = st.selectbox("Selecione um cenário", nomes_cenarios)
 
