@@ -67,12 +67,13 @@ if selected:
       st.session_state["visualizar_cenario"] = True
 
   with col2:
+    indice = next((i for i, c in enumerate(cenarios) if c.get("name") == selected), None)
     if st.button("🗑️ Excluir cenário"):
-      cenario_id = cenarios[selected]["id"]
+      cenario_id = cenarios[indice]["id"]
       resposta = requests.delete(f"{API_URL}/api/scenarios/delete/{cenario_id}", json={"user_id": user_id})
       if resposta.status_code == 200:
         st.success(f"Cenário `{selected}` excluído com sucesso.")
-        del cenarios[selected]
+        del cenarios[indice]
         st.session_state["cenario_selecionado"] = None
         st.session_state["visualizar_cenario"] = False
         st.experimental_rerun()
@@ -81,7 +82,8 @@ if selected:
 
 # Mostrar detalhes apenas se clicado em visualizar
 if st.session_state["visualizar_cenario"] and selected:
-  cenario = cenarios[selected]
+  indice = next((i for i, c in enumerate(cenarios) if c.get("name") == selected), None)
+  cenario = cenarios[indice]
   st.subheader("📊 Detalhes do Cenário")
 
   if "routes" in cenario:
@@ -93,5 +95,9 @@ if st.session_state["visualizar_cenario"] and selected:
     st.dataframe(pd.DataFrame(cenario["bus_types"]))
 
   if "parameters" in cenario:
-    st.markdown("**⚙️ Parâmetros**")
-    st.json(cenario["parameters"][0])
+    if cenario.get( "parameters" ):
+      st.markdown("**⚙️ Parâmetros**")
+      st.json(cenario["parameters"][0])
+    else:
+      st.markdown("**⚙️ Parâmetros**")
+      st.json([  ])
