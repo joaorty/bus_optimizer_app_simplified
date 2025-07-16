@@ -14,7 +14,7 @@ class Scenario(Base):
 
     solver_user = relationship("SolverUser", back_populates="scenarios")
     routes = relationship("Route", back_populates="scenario", cascade="all, delete-orphan")
-    solution = relationship("Solution", back_populates="scenario", cascade="all, delete-orphan")
+    solution = relationship("Solution", back_populates="scenario", cascade="all, delete-orphan", uselist=False)
     bus_types = relationship("BusType", back_populates="scenario", cascade="all, delete-orphan")
     parameters = relationship("Parameters", back_populates="scenario", cascade="all, delete-orphan")
 
