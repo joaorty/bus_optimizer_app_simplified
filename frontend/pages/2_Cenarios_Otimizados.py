@@ -1,10 +1,11 @@
 import streamlit as st
 from utils import require_login, Navbar, carregar_cenarios
 import requests
-from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
+from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, Icon
 import pandas as pd
 
 Navbar()
+Icon()
 require_login()
 
 st.title("📁 Cenários")

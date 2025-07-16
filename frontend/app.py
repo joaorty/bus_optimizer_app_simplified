@@ -5,6 +5,12 @@ from utils import Navbar
 from config import API_URL
 
 def main():
+
+  st.set_page_config(
+    page_title="Bus Allocation Optimizer",
+    page_icon="🚌",  # opcional
+  )
+
   @st.cache_data(ttl=300)
   def carregar_usuarios_da_api():
     """Consulta a API Flask e monta as credenciais para o streamlit-authenticator"""

@@ -1,7 +1,8 @@
 import streamlit as st
-from utils import require_login, carregar_cenarios, Navbar, gerar_dashboard
+from utils import require_login, carregar_cenarios, Navbar, gerar_dashboard, Icon
 
 Navbar()
+Icon()
 require_login()
 
 st.title("📊 Dashboards dos Cenários")

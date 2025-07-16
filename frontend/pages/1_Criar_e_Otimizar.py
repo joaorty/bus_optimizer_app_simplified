@@ -1,10 +1,11 @@
 import streamlit as st
 import pandas as pd
 import requests
-from utils import Navbar, require_login
+from utils import Navbar, require_login, Icon
 from config import API_URL
 
 Navbar()
+Icon()
 require_login()
 
 st.title("🔧 Criar e Otimizar Cenário")
