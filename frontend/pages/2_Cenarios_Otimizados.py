@@ -1,9 +1,10 @@
 import streamlit as st
-from utils import require_login, Navbar, carregar_cenarios
+from utils import require_login, Navbar, carregar_cenarios, Icon
 import requests
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
 import pandas as pd
 
+Icon()
 Navbar()
 require_login()
 
@@ -12,6 +13,12 @@ st.title("📁 Cenários")
 user_id = st.session_state.get("user_id")
 
 cenarios = carregar_cenarios(user_id)
+
+if not cenarios:
+  st.warning("Você ainda não criou nenhum cenário.")
+  st.markdown("👉 [Clique aqui para criar um novo cenário](./Criar_e_Otimizar)")
+  st.stop()
+
 selected = st.selectbox("Escolha um cenário", list(cenarios.keys()))
 # Monta DataFrame dos cenários
 cenarios_df = pd.DataFrame([

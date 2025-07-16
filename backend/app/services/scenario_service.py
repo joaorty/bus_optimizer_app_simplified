@@ -54,15 +54,13 @@ class ScenarioService:
             raise ValueError("Scenario not found or access denied.")
         return scenario.to_dict()
 
-    def get_all(self, user_id: int, db_session: Session):
+    def get_all(self, user_id: int):
         if user_id is None or not isinstance(user_id, int):
             raise ValueError("user_id must be provided and must be an integer.")
-        if db_session is None:
-            raise ValueError("db_session must be provided.")
 
-        scenarios = self.scenario_repository.find_all_by(user_id, db_session)
+        scenarios = self.scenario_repository.find_all_by(user_id = user_id)
         if not scenarios:
-            raise ValueError("No scenarios found for this user.")
+            return []
         return [scenario.to_dict() for scenario in scenarios]
 
     def update(self, user_id: int, scenario_id: int, name: str = None, description: str = None):

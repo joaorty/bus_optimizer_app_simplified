@@ -34,9 +34,10 @@ def gerar_dashboard(cenario: dict):
     figs.append(fig2)
 
   # --- 3. Solução otimizada: uso de ônibus por tipo ---
-  solutions = cenario.get("solutions", [])
-  if solutions:
-    sol = solutions[0]  # usa a primeira solução
+  solution = cenario.get("solution", {})
+  
+  if solution:
+    sol = solution
     v_dict = sol["solution_data"]["variables"]["v"]  # Ex: {"1_3": 2, ...}
     v_df = pd.DataFrame([
       {"bus_id": int(k.split("_")[0]), "route_id": int(k.split("_")[1]), "value": v}
