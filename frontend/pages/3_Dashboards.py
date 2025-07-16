@@ -68,10 +68,10 @@ if st.button("Gerar Dashboard"):
       else:
         st.info("Sem parâmetros disponíveis.")
 
-      solutions = dados_cenario.get("solutions", [])
+      solutions = dados_cenario.get("solution", {})
       print( solutions )
-      if solutions and solutions[0].get("objective_value") is not None:
-        st.metric("🎯 Valor Objetivo da Solução", round(solutions[0]["objective_value"], 2))
+      if solutions.get("objective_value") is not None:
+        st.metric("🎯 Valor Objetivo da Solução", round(solutions["objective_value"], 2))
       else:
         st.info("Sem valor objetivo disponível.")
 

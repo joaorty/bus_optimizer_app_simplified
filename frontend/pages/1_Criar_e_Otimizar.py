@@ -67,7 +67,6 @@ if st.button("Otimizar"):
   )
   if response.ok:
     st.success("Cenário enviado para otimização com sucesso!")
-    st.json(response.json())
   else:
     st.error(f"Erro {response.status_code} ao enviar cenário para otimização.")
     
