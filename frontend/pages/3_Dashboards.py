@@ -14,7 +14,7 @@ if not cenarios:
   st.markdown("👉 [Clique aqui para criar um novo cenário](./Criar_e_Otimizar)")
   st.stop()
 
-nomes_cenarios = list(cenarios.keys())
+nomes_cenarios = [ cenario.get( "name" ) for cenario in cenarios ]
 
 cenario_selecionado = st.selectbox("Selecione um cenário", nomes_cenarios)
 

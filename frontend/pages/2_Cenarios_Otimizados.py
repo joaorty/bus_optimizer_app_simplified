@@ -23,8 +23,11 @@ if not cenarios:
 
 # Criar DataFrame da tabela
 cenarios_df = pd.DataFrame([
-  {"Nome": nome, "Status": cenario.get("solution", {}).get("status", "Não otimizado")}
-  for nome, cenario in cenarios.items()
+    {
+        "Nome": cenario.get("name", "Sem nome"),
+        "Status": cenario.get("solution", {}).get("status", "Não otimizado")
+    }
+    for cenario in cenarios
 ])
 
 # Inicializa estado
